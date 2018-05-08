@@ -1,0 +1,63 @@
+00:02	Dialogue 1.
+00:05	What are you doing?
+00:08	I'm reading.
+00:10	Are you reading a comedy?
+00:12	No, I'm not.
+00:15	Are you reading a romance?
+00:19	No, I'm not.
+00:21	Are you reading an adventure?
+00:25	No, I'm not.
+00:27	Are you reading a tragedy?
+00:30	No, I'm not.
+00:33	Are you reading a science fiction story?
+00:38	No, I'm not.
+00:41	What are you reading?
+00:43	I'm reading a cookbook.
+00:51	Past tense regular.
+00:57	I walked home.
+01:00	You cleaned the store.
+01:04	We played at the park.
+01:09	We talked at the coffee shop.
+01:13	They jumped into the river.
+01:18	She studied at school.
+01:22	He cooked at the restaurant.
+01:31	What did you do yesterday?
+01:34	I walked home.
+01:37	What did you do yesterday?
+01:40	I cleaned the store.
+01:43	What did he do yesterday?
+01:46	He cooked at the restaurant.
+01:49	What did she do yesterday?
+01:52	She studied at school.
+01:56	What did you do yesterday?
+01:59	We played at the park.
+02:02	What did you do yesterday?
+02:05	We talked at the coffee shop.
+02:09	What did they do yesterday?
+02:12	They jumped into the river.
+02:20	Did you walk to the store?
+02:23	No, I didn't.
+02:26	Did he cook at the restaurant?
+02:30	Yes, he did.
+02:33	Did she play at school?
+02:36	No, she didn't.
+02:38	Did you play at the park?
+02:42	Yes, we did.
+02:45	Did you walk to the coffee shop?
+02:49	No, we didn't.
+02:52	Did they jump into the river?
+02:55	Yes, they did.
+02:58	Did you lock the door?
+03:00	Yes, I did.
+03:07	When did he walk to school?
+03:10	He walked to school at 8 o clock.
+03:14	When did you cook dinner?
+03:17	I cooked dinner at 6 o'clock.
+03:20	When did you clean your room?
+03:23	I cleaned my room last week.
+03:27	When did he wash his car?
+03:30	He washed his car yesterday.
+03:34	When did she type the report?
+03:38	She typed it last night.
+03:42	When did you graduate?
+03:45	We graduated.
