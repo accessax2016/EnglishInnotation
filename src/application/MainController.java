@@ -2,13 +2,20 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javafx.application.Platform;
@@ -27,6 +34,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -36,6 +45,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import model.Video;
 
 public class MainController {
 
@@ -54,6 +64,8 @@ public class MainController {
 	@FXML
 	private Button btnAddVideo;
 	@FXML
+	private Button btnDeleteVideo;
+	@FXML
 	private Button btnAddSubtitle;
 	@FXML
 	private ListView<String> listVideo;
@@ -65,33 +77,44 @@ public class MainController {
 	private Label lblTimeVideo;
 	@FXML
 	private Slider sliderVloume;
+	@FXML 
+	private TabPane tab;
 	
 	// Unity
 //	private Media media;
 	private MediaPlayer mediaPlayer;
 	private Duration duration;
+	private List<Video> videos = new ArrayList<Video>();
+	private int indexSelectedVideo;
 	
 	
 	public void initialize() {
         System.out.println("initilize");
         
-        setListVideo();
+        tab.getSelectionModel().select(1);
+		btnAddSubtitle.setDisable(true);
+		btnDeleteVideo.setDisable(true);
+		indexSelectedVideo = -1;
+        
+		setListVideo();
+		
         setActionListVideo();
-        
-        
-//        setMediaVideo("E:\\Dev Sofware\\Java\\code\\EnglishInnotation\\resources\\videos\\video1.mp4");
-//        setActionSliderTimeVideo();
-//        
-//        readFileSubtitle("E:\\Dev Sofware\\Java\\code\\EnglishInnotation\\resources\\subtitles\\video1.txt");
-//        setActionListSubtitle();
-        
-//        play();
+        setActionSliderTimeVideo();
+        setActionListSubtitle();
         
     }
 
 	public void setListVideo() {
-		ObservableList<String> items = FXCollections.observableArrayList ("video1", "video2", "video3", "video4");
-        listVideo.setItems(items);
+		
+		
+//		ObservableList<String> items = FXCollections.observableArrayList ("video1", "video2", "video3", "video4");
+//        listVideo.setItems(items);
+		readListVideo();
+		for (int i = 0; i < videos.size(); i++) {
+//			System.out.println(videos.get(i).getName());
+			listVideo.getItems().add(videos.get(i).getName());
+		}
+		
 	}
 	
 	public void setActionListVideo() {
@@ -100,17 +123,32 @@ public class MainController {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				// TODO Auto-generated method stub
-				mediaPlayer.stop();
-				btnPlay.setText(">");
-				sliderTimeVideo.setValue(0);
+				if (newValue == null) {
+					// reset state
+			        btnPlay.setText(">");
+					sliderTimeVideo.setValue(0);
+					listSubtitle.getItems().clear();
+					
+					lblTitle.setText("Không có Video");
+					
+					btnDeleteVideo.setDisable(true);
+					btnAddSubtitle.setDisable(true);
+					return;
+				}
 				
-				listSubtitle.getItems().clear();
+				btnDeleteVideo.setDisable(false);
+				indexSelectedVideo = listVideo.getSelectionModel().getSelectedIndex();
 				
-				setMediaVideo("/videos/" + newValue + ".mp4");
+				lblTitle.setText(videos.get(indexSelectedVideo).getName());
 				
-				readFileSubtitle("E:\\Dev Sofware\\Java\\code\\EnglishInnotation\\resources\\subtitles\\" + newValue + ".txt");
+				setMediaVideo(videos.get(indexSelectedVideo).getUrlVideo());
 				
-				play();
+				if (videos.get(indexSelectedVideo).getUrlSubtitle() != null) {
+					readFileSubtitle(videos.get(indexSelectedVideo).getUrlSubtitle());
+				}
+				
+				btnAddSubtitle.setDisable(false);
+				
 			}
 		});
 	}
@@ -173,6 +211,8 @@ public class MainController {
         btnPlay.setText(">");
 		sliderTimeVideo.setValue(0);
 		listSubtitle.getItems().clear();
+		// action
+		play();
 	}
 	
 	public void setActionSliderTimeVideo() {
@@ -285,24 +325,100 @@ public class MainController {
 	        }
 	    }
 	
-	public void locateFile(ActionEvent event) {
-		Node node = (Node) event.getSource();
-		
-	    FileChooser chooser = new FileChooser();
+	public File locateFile(Node node) {
+		FileChooser chooser = new FileChooser();
 	    chooser.setTitle("Chon Video");
-	    File file = chooser.showOpenDialog(node.getScene().getWindow());
-	    if(file != null){
-
-			
-			
-			setMediaVideo(file.toURI().toString());
-			
-			play();
-	    }   
-	    
-	    
-		
-		
-		
+	    return chooser.showOpenDialog(node.getScene().getWindow());
+	
 	}
+	
+	public void addVideo(ActionEvent event) {
+		Node node = (Node) event.getSource();
+		File file = locateFile(node); 
+		if (file != null) {
+//			System.out.println(file.getName());
+			
+//			setMediaVideo(file.toURI().toString());
+			
+			videos.add(new Video(file.getName(), file.toURI().toString()));
+			
+			listVideo.getItems().add(file.getName());
+			
+			writeListVideo();
+		}
+	
+	}
+	
+	public void addSubtitle(ActionEvent event) {
+		if (indexSelectedVideo > -1) {
+			Node node = (Node) event.getSource();
+			File file = locateFile(node);
+			if (file != null) {
+				listSubtitle.getItems().clear();
+						
+				readFileSubtitle(file.toString());
+				
+				videos.get(indexSelectedVideo).setUrlSubtitle(file.toString());
+			}
+		}
+
+	}
+	
+	public void deleteVideo(ActionEvent event) {
+		if (indexSelectedVideo > -1) {
+			videos.remove(indexSelectedVideo);
+			listVideo.getItems().remove(indexSelectedVideo);
+		}
+	}
+	
+	public void writeListVideo() {
+		try {
+			File file = new File(".\\videos.txt");
+			if (file.exists()) {
+				file.delete();
+				try {
+					file.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			FileOutputStream fout = new FileOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(fout);
+
+			oos.writeObject(videos);
+
+			oos.close();
+			fout.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		} catch (IOException e) {
+			System.out.println("Error initializing stream");
+		}	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void readListVideo() {
+		try {
+			FileInputStream fin = new FileInputStream(new File(".\\videos.txt"));
+			ObjectInputStream ois = new ObjectInputStream(fin);
+			
+			videos = (ArrayList<Video>)ois.readObject(); 
+				
+			ois.close();
+			fin.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		} catch (IOException e) {
+			System.out.println("Error initializing stream");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void stop() {
+		writeListVideo();
+		System.out.println("stop");
+	}
+
 }
