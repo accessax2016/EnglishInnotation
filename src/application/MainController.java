@@ -16,7 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -32,6 +35,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
@@ -44,7 +48,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 import javafx.util.Duration;
+import model.Subtitle;
 import model.Video;
 
 public class MainController {
@@ -60,7 +66,7 @@ public class MainController {
 	@FXML
 	private CheckBox chkFavorite;
 	@FXML
-	private ListView<String> listSubtitle;
+	private ListView<Subtitle> listSubtitle;
 	@FXML
 	private Button btnAddVideo;
 	@FXML
@@ -81,11 +87,14 @@ public class MainController {
 	private TabPane tab;
 	
 	// Unity
-//	private Media media;
 	private MediaPlayer mediaPlayer;
 	private Duration duration;
 	private List<Video> videos = new ArrayList<Video>();
 	private int indexSelectedVideo;
+	private List<Subtitle> subtitles = new ArrayList<Subtitle>();
+	private int indexSelectedSubtitle;
+	ObservableList<Subtitle> observableList = FXCollections.observableArrayList();
+	private boolean notEvent = false;
 	
 	
 	public void initialize() {
@@ -94,24 +103,23 @@ public class MainController {
         tab.getSelectionModel().select(1);
 		btnAddSubtitle.setDisable(true);
 		btnDeleteVideo.setDisable(true);
+		btnPlay.setDisable(true);
 		indexSelectedVideo = -1;
+		indexSelectedSubtitle = 0;
         
 		setListVideo();
 		
         setActionListVideo();
         setActionSliderTimeVideo();
         setActionListSubtitle();
+        setActionCheckboxFavorite();
         
     }
 
 	public void setListVideo() {
 		
-		
-//		ObservableList<String> items = FXCollections.observableArrayList ("video1", "video2", "video3", "video4");
-//        listVideo.setItems(items);
 		readListVideo();
 		for (int i = 0; i < videos.size(); i++) {
-//			System.out.println(videos.get(i).getName());
 			listVideo.getItems().add(videos.get(i).getName());
 		}
 		
@@ -128,6 +136,7 @@ public class MainController {
 			        btnPlay.setText(">");
 					sliderTimeVideo.setValue(0);
 					listSubtitle.getItems().clear();
+					subtitles.clear();
 					
 					lblTitle.setText("Không có Video");
 					
@@ -137,6 +146,7 @@ public class MainController {
 				}
 				
 				btnDeleteVideo.setDisable(false);
+				btnPlay.setDisable(false);
 				indexSelectedVideo = listVideo.getSelectionModel().getSelectedIndex();
 				
 				lblTitle.setText(videos.get(indexSelectedVideo).getName());
@@ -145,6 +155,17 @@ public class MainController {
 				
 				if (videos.get(indexSelectedVideo).getUrlSubtitle() != null) {
 					readFileSubtitle(videos.get(indexSelectedVideo).getUrlSubtitle());
+					
+//					for (int i = 0; i < subtitles.size(); i++) {
+//						
+////						listSubtitle.getItems().add(subtitles.get(i).getStartTime() + "	  " + subtitles.get(i).getContent());
+//					}
+//					observableList.clear();
+					observableList.setAll(subtitles);
+//					listSubtitle.getItems().clear();
+					listSubtitle.setItems(observableList);
+					listSubtitle.setCellFactory(param -> new Cell());
+					
 				}
 				
 				btnAddSubtitle.setDisable(false);
@@ -154,11 +175,12 @@ public class MainController {
 	}
 	
 	public void setActionListSubtitle() {
-		listSubtitle.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		listSubtitle.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Subtitle>() {
 
 			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends Subtitle> observable, Subtitle oldValue, Subtitle newValue) {
 				// TODO Auto-generated method stub
+				if (notEvent) return;
 				if (newValue == null) return;
 				
 				SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
@@ -166,12 +188,32 @@ public class MainController {
 
                 Date date = null;
                 try {
-                    date = sdf.parse(newValue.substring(0,5));
+                    date = sdf.parse(newValue.getStartTime());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
                 mediaPlayer.seek(Duration.millis(date.getTime()));
+                indexSelectedSubtitle = listSubtitle.getSelectionModel().getSelectedIndex();
+                changeSelectSubtitle(indexSelectedSubtitle);
+			}
+		});
+	}
+	
+	public void setActionCheckboxFavorite() {
+		chkFavorite.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				// TODO Auto-generated method stub
+				if (newValue) {
+					List<Subtitle> list = observableList.stream().filter(sub -> sub.getIsFavorite() == true).collect(Collectors.toList());
+					System.out.println(list);
+					observableList.setAll(list);
+					listSubtitle.setItems(observableList);
+					listSubtitle.setCellFactory(param -> new Cell());
+					
+				}
 			}
 		});
 	}
@@ -219,8 +261,13 @@ public class MainController {
 		sliderTimeVideo.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
                 if (sliderTimeVideo.isValueChanging()) {
-                    // multiply duration by percentage calculated by slider position
+                    // multiply duration by percentage calculated by slider position      	
                     mediaPlayer.seek(duration.multiply(sliderTimeVideo.getValue() / 100.0));
+                    changeSelectSubtitle(0);
+                    notEvent = true;
+    				listSubtitle.getSelectionModel().select(indexSelectedSubtitle - 1);
+    				notEvent = false;
+                    
                 }
             }
         });
@@ -285,6 +332,10 @@ public class MainController {
         {
             public void invalidated(Observable ov) {
             	updateTimeVideo();
+            	changeSelectSubtitle(indexSelectedSubtitle);
+            	notEvent = true;
+				listSubtitle.getSelectionModel().select(indexSelectedSubtitle - 1);
+				notEvent = false;
             }
         });
 		mediaPlayer.setOnPlaying(new Runnable() {
@@ -308,17 +359,76 @@ public class MainController {
             public void run() {
             	mediaPlayer.seek(mediaPlayer.getStartTime());
             	sliderTimeVideo.setValue(0);
+            	indexSelectedSubtitle = 0;
             	mediaPlayer.pause();
             }
         });
     }
 	
-	public void readFileSubtitle(String url){
+	public void changeSelectSubtitle(int index) {
+		Duration currentTime = mediaPlayer.getCurrentTime();
+		
+		for (int i = index; i < subtitles.size(); i++) {
+//			System.out.println(currentTime.equals(convertStringToDuration(subtitles.get(i).getStartTime())));
+			
+			if (currentTime.greaterThan(convertStringToDuration(subtitles.get(i).getStartTime()))) {
+//				notEvent = true;
+//				listSubtitle.getSelectionModel().select(i);
+//				notEvent = false;
+				indexSelectedSubtitle = i + 1;
+				break;
+			}
+		}
+//		listSubtitle.getSelectionModel().select(indexSelectedSubtitle - 1);
+		
+//		int i = 0;
+//		while (i < subtitles.size()) {
+//			if (currentTime.lessThan(convertStringToDuration(subtitles.get(i).getStartTime()))) {
+//				
+//				i++;
+//			}
+//			else {
+//				indexSelectedSubtitle = i;
+//				break;
+//			}
+//			
+//		}
+//		
+//		if (indexSelectedSubtitle != -1) {
+//			listSubtitle.getSelectionModel().select(indexSelectedSubtitle);
+//		}
+
+	}
+	
+	public Duration convertStringToDuration(String time) {
+		SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        
+        Date date = null;
+		try {
+			date = sdf.parse(time);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Duration.millis(date.getTime());
+	}
+	
+	public void readFileSubtitle(String url){ 
 	        try (BufferedReader reader = new BufferedReader(new FileReader(new File(url)))) {
+	        	subtitles.clear();
 	            String line;
 	            while ((line = reader.readLine()) != null){
 //	            	System.out.println(line);
-	                listSubtitle.getItems().add(line);
+//	                listSubtitle.getItems().add(line);
+	                
+	                String startTime = line.substring(0, 5);
+	                String content = line.substring(5).trim();
+	                subtitles.add(new Subtitle(startTime, content, false));
+	             
+	                observableList.setAll(subtitles);
+					listSubtitle.setItems(observableList);
+					listSubtitle.setCellFactory(param -> new Cell());
 	            }
 	        } catch (IOException e) {
 	            e.printStackTrace();
@@ -343,8 +453,6 @@ public class MainController {
 			videos.add(new Video(file.getName(), file.toURI().toString()));
 			
 			listVideo.getItems().add(file.getName());
-			
-			writeListVideo();
 		}
 	
 	}
@@ -416,8 +524,54 @@ public class MainController {
 		}
 	}
 	
+//	public void writeListSubtitle() {
+//		try {
+//			File file = new File(".\\subtitles.txt");
+//			if (file.exists()) {
+//				file.delete();
+//				try {
+//					file.createNewFile();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			FileOutputStream fout = new FileOutputStream(file);
+//			ObjectOutputStream oos = new ObjectOutputStream(fout);
+//
+//			oos.writeObject(subtitles);
+//
+//			oos.close();
+//			fout.close();
+//		} catch (FileNotFoundException e) {
+//			System.out.println("File not found");
+//		} catch (IOException e) {
+//			System.out.println("Error initializing stream");
+//		}	
+//	}
+//	
+//	@SuppressWarnings("unchecked")
+//	public void readListSubtitle() {
+//		try {
+//			FileInputStream fin = new FileInputStream(new File(".\\subtitles.txt"));
+//			ObjectInputStream ois = new ObjectInputStream(fin);
+//			
+//			subtitles = (ArrayList<Subtitle>)ois.readObject(); 
+//				
+//			ois.close();
+//			fin.close();
+//		} catch (FileNotFoundException e) {
+//			System.out.println("File not found");
+//		} catch (IOException e) {
+//			System.out.println("Error initializing stream");
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+	
 	public void stop() {
 		writeListVideo();
+//		writeListSubtitle();
 		System.out.println("stop");
 	}
 

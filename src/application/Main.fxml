@@ -87,7 +87,7 @@
                               <ListView fx:id="listSubtitle" prefHeight="450.0" prefWidth="400.0" />
                            </children>
                         </Pane>
-                        <Button fx:id="btnAddSubtitle" layoutX="22.0" layoutY="561.0" mnemonicParsing="false" onAction="#addSubtitle" prefHeight="40.0" prefWidth="200.0" text="Thêm Phụ Đề">
+                        <Button fx:id="btnAddSubtitle" layoutX="20.0" layoutY="570.0" mnemonicParsing="false" onAction="#addSubtitle" prefHeight="40.0" prefWidth="200.0" text="Thêm Phụ Đề">
                            <font>
                               <Font name="Arial" size="20.0" />
                            </font>
