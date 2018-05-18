@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Slider?>
@@ -15,17 +14,17 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<Pane prefHeight="768.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+<Pane prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
-      <Pane layoutX="30.0" layoutY="30.0" prefHeight="700.0" prefWidth="800.0">
+      <Pane layoutX="14.0" layoutY="104.0" prefHeight="650.0" prefWidth="928.0">
          <children>
-            <MediaView fx:id="mediaVideo" fitHeight="600.0" fitWidth="800.0" layoutX="14.0" />
-            <HBox fx:id="mediaTool" layoutY="600.0" prefHeight="100.0" prefWidth="800.0">
+            <MediaView fx:id="mediaVideo" fitHeight="550.0" fitWidth="930.0" layoutX="-1.0" />
+            <HBox fx:id="mediaTool" layoutY="543.0" prefHeight="100.0" prefWidth="928.0">
                <padding>
                   <Insets top="30.0" />
                </padding>
                <children>
-                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#handleButtonPlay" text="&gt;">
+                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#handleButtonPlay" prefHeight="37.0" prefWidth="68.0" text="►">
                      <font>
                         <Font name="Arial" size="20.0" />
                      </font>
@@ -33,7 +32,7 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Slider fx:id="sliderTimeVideo" prefHeight="20.0" prefWidth="400.0">
+                  <Slider fx:id="sliderTimeVideo" prefHeight="20.0" prefWidth="711.0">
                      <HBox.margin>
                         <Insets left="40.0" top="10.0" />
                      </HBox.margin>
@@ -46,76 +45,58 @@
                         <Insets left="10.0" top="5.0" />
                      </HBox.margin>
                   </Label>
-                  <Label text="Loa">
-                     <font>
-                        <Font name="Arial" size="20.0" />
-                     </font>
-                     <HBox.margin>
-                        <Insets left="20.0" top="5.0" />
-                     </HBox.margin>
-                  </Label>
-                  <Slider fx:id="sliderVolume" prefHeight="20.0" prefWidth="100.0" value="100.0">
-                     <HBox.margin>
-                        <Insets left="10.0" top="10.0" />
-                     </HBox.margin>
-                  </Slider>
                </children></HBox>
+            <Label fx:id="lblMediaVideo" alignment="CENTER" layoutX="-3.0" layoutY="-5.0" onMouseClicked="#handleLabelMediaVideo" prefHeight="559.0" prefWidth="930.0" text="VIDEO">
+               <font>
+                  <Font name="Arial" size="72.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
-      <TabPane fx:id="tab" layoutX="860.0" layoutY="100.0" prefHeight="650.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="tab" layoutX="952.0" layoutY="33.0" prefHeight="721.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab fx:id="tabSubtitle" text="                    Phụ Đề                    ">
+          <Tab fx:id="tabSubtitle" text="                Phụ Đề                ">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="400.0">
                      <children>
-                        <Pane prefHeight="100.0" prefWidth="400.0">
+                        <Pane prefHeight="60.0" prefWidth="400.0">
                            <children>
-                              <TextField fx:id="txtSearchSubtitle" layoutX="20.0" layoutY="10.0" prefHeight="40.0" prefWidth="360.0" promptText="Tìm kiếm phụ đề ..." visible="false">
+                              <TextField fx:id="txtSearchSubtitle" layoutX="20.0" layoutY="10.0" prefHeight="40.0" prefWidth="360.0" promptText="Tìm kiếm phụ đề ...">
                                  <font>
                                     <Font name="Arial" size="20.0" />
                                  </font>
                               </TextField>
-                              <CheckBox fx:id="chkFavorite" layoutX="20.0" layoutY="50.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="360.0" text="Yêu Thích">
-                                 <font>
-                                    <Font name="Arial" size="20.0" />
-                                 </font>
-                              </CheckBox>
                            </children>
                         </Pane>
-                        <Pane layoutY="100.0" prefHeight="520.0" prefWidth="400.0">
+                        <Pane layoutY="70.0" prefHeight="612.0" prefWidth="400.0">
                            <children>
-                              <ListView fx:id="listSubtitle" prefHeight="450.0" prefWidth="400.0" />
+                              <ListView fx:id="listSubtitle" prefHeight="600.0" prefWidth="400.0" />
                            </children>
                         </Pane>
-                        <Button fx:id="btnAddSubtitle" layoutX="20.0" layoutY="570.0" mnemonicParsing="false" onAction="#addSubtitle" prefHeight="40.0" prefWidth="200.0" text="Thêm Phụ Đề">
-                           <font>
-                              <Font name="Arial" size="20.0" />
-                           </font>
-                        </Button>
                      </children></AnchorPane>
             </content>
           </Tab>
-          <Tab fx:id="tabVideo" text="                    Video                    ">
+          <Tab fx:id="tabVideo" text="                Video                ">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="400.0">
                      <children>
                         <Pane prefHeight="100.0" prefWidth="400.0">
                            <children>
-                              <Button fx:id="btnAddVideo" layoutX="20.0" layoutY="30.0" mnemonicParsing="false" onAction="#addVideo" prefHeight="40.0" prefWidth="150.0" text="Thêm Video">
+                              <Button fx:id="btnAddVideo" layoutX="14.0" layoutY="30.0" mnemonicParsing="false" onAction="#addVideo" prefHeight="40.0" prefWidth="150.0" text="Thêm Video">
                                  <font>
                                     <Font name="Arial" size="20.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnDeleteVideo" layoutX="200.0" layoutY="30.0" mnemonicParsing="false" onAction="#deleteVideo" prefHeight="40.0" prefWidth="150.0" text="Xóa Video">
+                              <Button fx:id="btnDeleteVideo" layoutX="236.0" layoutY="30.0" mnemonicParsing="false" onAction="#deleteVideo" prefHeight="40.0" prefWidth="150.0" text="Xóa Video">
                                  <font>
                                     <Font name="Arial" size="20.0" />
                                  </font>
                               </Button>
                            </children>
                         </Pane>
-                        <Pane layoutY="100.0" prefHeight="450.0" prefWidth="400.0">
+                        <Pane layoutY="100.0" prefHeight="580.0" prefWidth="400.0">
                            <children>
-                              <ListView fx:id="listVideo" prefHeight="450.0" prefWidth="400.0" />
+                              <ListView fx:id="listVideo" prefHeight="570.0" prefWidth="400.0" />
                            </children>
                         </Pane>
                      </children></AnchorPane>
@@ -123,10 +104,15 @@
           </Tab>
         </tabs>
       </TabPane>
-      <Label fx:id="lblTitle" layoutX="860.0" layoutY="30.0" prefHeight="60.0" prefWidth="400.0" text="Không có Video">
+      <Label fx:id="lblTitle" layoutX="30.0" layoutY="24.0" prefHeight="60.0" prefWidth="500.0" text="Không có Video" underline="true">
          <font>
             <Font name="Arial" size="30.0" />
          </font>
       </Label>
+      <Button fx:id="btnAddSubtitle" layoutX="742.0" layoutY="34.0" mnemonicParsing="false" onAction="#addSubtitle" prefHeight="40.0" prefWidth="200.0" text="Thêm Phụ Đề">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Button>
    </children>
 </Pane>

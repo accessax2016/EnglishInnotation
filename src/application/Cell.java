@@ -30,20 +30,27 @@ public class Cell extends ListCell<Subtitle>{
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				lblContent.setTextFill(Color.BLUE);
-				lblStartTime.setTextFill(Color.BLUE);
-				btn.setText("Bỏ Thích");
+				if (getItem().getIsFavorite()) {
+					lblContent.setTextFill(Color.BLACK);
+					lblStartTime.setTextFill(Color.BLACK);
+					btn.setText("Thích");
+					getItem().setIsFavorite(false);
+				}
+				else {
+					lblContent.setTextFill(Color.BLUE);
+					lblStartTime.setTextFill(Color.BLUE);
+					btn.setText("Bỏ Thích");
+					getItem().setIsFavorite(true);
+				}
 				
 			}
 		});
-		
 		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
 				// TODO Auto-generated method stub
 				btn.setVisible(true);
-				getItem().setIsFavorite(btn.isVisible());
 			}
 		});
 		this.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -52,7 +59,6 @@ public class Cell extends ListCell<Subtitle>{
 			public void handle(MouseEvent event) {
 				// TODO Auto-generated method stub
 				btn.setVisible(false);
-				getItem().setIsFavorite(btn.isVisible());
 			}
 		});
 	}

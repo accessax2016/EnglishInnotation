@@ -17,7 +17,7 @@ public class Main extends Application {
 			Parent root = loader.load();
 			MainController controller = loader.getController();
 			
-			Scene scene = new Scene(root, 1280, 768);
+			Scene scene = new Scene(root, 1366, 768);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setTitle("English Innotation");
 			primaryStage.setScene(scene);
